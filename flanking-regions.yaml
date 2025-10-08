@@ -1,10 +1,11 @@
-name: flanking-regions 
+name: flanking-regions
 channels:
   - bioconda
   - conda-forge
   - defaults
   - r
 dependencies:
+  - python=3.10
   - scipy
   - pandas
   - snp-dists
@@ -15,9 +16,25 @@ dependencies:
   - untangle
   - mmseqs2
   - treetime==0.9.4
-#  - pairsnp
-  - snakemake==7.32
-#  - ca-certificates
-#  - certifi
-#  - openssl
+  - snakemake=7.32
+  - pulp=2.7.0        
   - altair
+  - minimap2
+  - graphviz
+  - blast=2.13.0
+  - r-base=4.*
+  - julia=1.7.2
+  - mafft=7.*
+  - r-ape
+  - r-cowplot
+  - r-docopt
+  - r-ggdendro
+  - r-gridextra
+  - r-gggenes
+  - r-ggrepel
+  - r-reshape2
+  - r-rcolorbrewer
+  - r-vegan
+  - r-dplyr
+  - bioconductor-ggtree
+  - bioconductor-treeio
