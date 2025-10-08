@@ -1,11 +1,8 @@
 # Visualizing and quantifying structural diversity around mobile AMR genes
 
-__Liam P. Shaw__
+Original : __Liam P. Shaw__
 
-> [!WARNING]
-> 21 July 2025: since this repository was written in late 2023, pangraph has undergone a major migration between v0 and v1. This repository was written to    work with pangraph v0.7.0 and has not been updated for the newer versions of pangraph. A test version for pangraph v1.2.0 is available on the `pangraph_1.2.0` branch. This has not been validated, but seems to work on the GES-1 test dataset with all aspects apart from plotting positional entropies, which have     been removed temporarily from the Snakefile.
-
-This repository contains a pipeline to analyse the flanking regions of genes using [pangraph](https://github.com/neherlab/pangraph). 
+This repo provides a reproducible Docker image for running the mobile-gene-regions pipeline with PanGraph v0 (legacy Julia implementation), Snakemake v7, and pinned dependencies (BLAST+, MAFFT, R libs, etc.). to analyse the flanking regions of genes using [pangraph](https://github.com/neherlab/pangraph). 
 
 It was developed for the analysis of mobile AMR genes, but in principle can be used for any input gene. 
 
@@ -15,70 +12,50 @@ Visualizing and quantifying structural diversity around mobile AMR genes
 Liam P. Shaw and Richard A. Neher, *biorxiv* (2023)  
 doi: [10.1101/2023.08.07.551646](https://doi.org/10.1101/2023.08.07.551646)
 
+**Why this image?** The original project spans Python, Snakemake, R, and Julia with version-sensitive tools. Containerizing removes version headaches and “works on my machine” issues.
+
 ### Installation
 
-The pipeline requires [pangraph](https://github.com/neherlab/pangraph) to be installed first. Currently it uses the `feat/unbalanced-tree` branch which can be installed with:
+Clone this repository:
 
 ```
-git clone -b feat/unbalanced-tree https://github.com/neherlab/pangraph.git && cd pangraph
-```
-
-Then follow the installation instructions from the pangraph github as normal. Note that because pangraph was written in a specific version of Julia, you'll currently need to install **Julia v1.7.2** which you can download [here](https://julialang.org/downloads/oldreleases/). 
-
-Then you will need to clone this repository:
-
-```
-git clone https://github.com/liampshaw/mobile-gene-regions.git
+git clone https://github.com/zahidul-islam-nahid/mobile-gene-regions.git
 ``` 
 
-Other dependencies can be installed with conda or mamba (recommended: mamba). From inside this directory (`cd mobile-gene-regions`):
+Build the image
 
 ```
-mamba env create -f flanking-regions.yaml # Note that snakemake v7 is required, not v8
-conda activate flanking-regions
+docker build -t mobile-gene-regions .
 ```
 
-There are also R packages required for some plots. (If you don't have R, you can download it [here](https://www.r-project.org/).) These R packages can be installed with a helper script in this repository:
-
-```
-# cd mobile-gene-regions
-Rscript scripts/install_libraries.R
-```
-
-If you have followed all of these steps, you should have the pipeline installed and ready to run. 
+That's all, feel free to test it.
 
 ### Test
 
 You can test whether it's working with data in the `test_data` directory (33 sequences containing GES-1 variants), running the following command from within the cloned repository:
 
 ```
-python analyze-flanking-regions.py \
-	--contigs test_data/GES-1_contigs.fa \
-	--gene_fasta test_data/GES-1.fa \ 
-	--output test_data_output \
+mkdir -p test_data_output && chmod -R 777 test_data_output
+
+docker run --rm -it \
+  -v "$PWD/input:/data" \
+  -v "$PWD/output:/out" \
+  mobile-gene-regions \
+  micromamba run -n flanking-regions python analyze-flanking-regions.py \
+	--contigs /data/GES-1_contigs.fa \
+	--gene_fasta /data/GES-1.fa \ 
+	--output /out \
 	--gff test_data/GES-1_annotations.gff \
-	--focal_gene_name GES-1	
+	--focal_gene_name GES-1
+	--force
 ```
 
 If this runs well, you should be able to inspect the plots in `test_data_output/plots`. If it doesn't, the installation may not have worked.   
 
 ### Usage
 
-Basic usage (run from within this directory):
-
 ```
-python analyze-flanking-regions.py \
-        --contigs contig_fasta.fa \
-        --gene_fasta focal_gene.fa \
-        --focal_gene_name gene_name \
-        --output_dir output
-```
-
-The underlying pipeline has flexible parameters such as the size of the flanking region, the number of single nucleotide variants (SNVs) allowed in the focal gene, and pangraph parameters:
-
-
-```
-options:
+**Required:**
   -h, --help            show this help message and exit
   --contigs CONTIGS     fasta with contigs containing central/focal gene
   --gene_fasta GENE_FASTA
