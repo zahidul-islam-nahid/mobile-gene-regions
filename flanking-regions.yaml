@@ -2,8 +2,6 @@ name: flanking-regions
 channels:
   - bioconda
   - conda-forge
-  - defaults
-  - r
 dependencies:
   - python=3.10
   - scipy
