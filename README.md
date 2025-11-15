@@ -38,15 +38,15 @@ You can test whether it's working with data in the `test_data` directory (33 seq
 mkdir -p test_data_output && chmod -R 777 test_data_output
 
 docker run --rm -it \
-  -v "$PWD/input:/data" \
-  -v "$PWD/output:/out" \
+  -v "$PWD/test_data:/data" \
+  -v "$PWD/test_data_output:/out" \
   mobile-gene-regions \
   micromamba run -n flanking-regions python analyze-flanking-regions.py \
 	--contigs /data/GES-1_contigs.fa \
-	--gene_fasta /data/GES-1.fa \ 
+	--gene_fasta /data/GES-1.fa \
 	--output /out \
 	--gff test_data/GES-1_annotations.gff \
-	--focal_gene_name GES-1
+	--focal_gene_name GES-1 \
 	--force
 ```
 
